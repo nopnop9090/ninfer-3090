@@ -99,7 +99,9 @@ Pre-converted Huihui-abliterated `.ninfer` artifacts (no local BF16 conversion r
 ```
 
 On 24 GB: 35B needs `--text-only`; 27B can run with vision. Default serve scripts use
-`--max-context 65536` (see `scripts/install-root/`).
+`--no-cuda-graph` with `--max-context 65536` (35B) / `64000` (27B vision). With CUDA Graphs left
+on, serve + MTP + prompt-lookup only fits ~8k–12k — see
+[docs/community-rtx3090-notes.md](docs/community-rtx3090-notes.md).
 
 ## Recommended 35B-A3B command
 

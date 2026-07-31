@@ -10,10 +10,12 @@ if defined NINFER_ROOT (
   exit /b 1
 )
 cd /d "%ROOT%\bin" || exit /b 1
+REM Vision + serve graphs: 65536 OOMs; 64000 fits with --no-cuda-graph on 24GB.
 ninfer-serve.exe ..\models\qwen3_6_27b.ninfer ^
   --model-id qwen3.6-27b ^
   --host 127.0.0.1 --port 8080 ^
-  --max-context 65536 --prefill-chunk 128 --kv-dtype int8 ^
+  --max-context 64000 --prefill-chunk 128 --kv-dtype int8 ^
   --mtp-draft-tokens 3 --lm-head-draft ^
   --prompt-lookup-tokens 15 --prompt-lookup-min-match 4 ^
-  --prompt-lookup-auto --prompt-lookup-min-context 1000
+  --prompt-lookup-auto --prompt-lookup-min-context 1000 ^
+  --no-cuda-graph

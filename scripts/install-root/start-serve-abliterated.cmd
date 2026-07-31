@@ -10,6 +10,7 @@ if defined NINFER_ROOT (
   exit /b 1
 )
 cd /d "%ROOT%\bin" || exit /b 1
+REM Serve CUDA-graph capture needs extra VRAM; on 24GB keep 65k via --no-cuda-graph.
 ninfer-serve.exe ..\models\qwen3_6_35b_a3b_huihui_abliterated.ninfer ^
   --model-id qwen3.6-35b-a3b-huihui-abliterated ^
   --host 127.0.0.1 --port 8080 ^
@@ -17,4 +18,5 @@ ninfer-serve.exe ..\models\qwen3_6_35b_a3b_huihui_abliterated.ninfer ^
   --mtp-draft-tokens 3 --lm-head-draft ^
   --prompt-lookup-tokens 15 --prompt-lookup-min-match 4 ^
   --prompt-lookup-auto --prompt-lookup-min-context 1000 ^
+  --no-cuda-graph ^
   --text-only

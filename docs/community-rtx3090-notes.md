@@ -105,7 +105,37 @@ Absolute capacity (slower / quality trade-off):
 | 35B `--kv-dtype k8v4` or `int4` + `--no-cuda-graph --text-only` | **131072** |
 | 27B `--kv-dtype k8v4` + `--no-cuda-graph` (vision) | **131072** |
 
-Default serve helpers in this branch use **65536** (stable INT8 budget with headroom for desktop GPU load).
+CLI max-context numbers above are **not** directly transferable to `ninfer-serve` with the same
+flags. CLI and serve share the same engine planner; the OOM gap comes from **what is reserved at
+startup**, not from a second memory system.
+
+### CUDA Graphs (what / why / cost)
+
+CUDA Graphs record a full decode round once and **replay** it each step, cutting CPU launch
+overhead (higher tok/s). They are **on by default**.
+
+Cost: VRAM for many captured executables across capacity **frontier ranges**, plus separate
+families for ordinary decode, MTP, and prompt-lookup. Long frontiers are budgeted at tens of MiB
+each in the planner (`graph_allowance_bytes`). Large `--max-context` combined with MTP **and**
+prompt-lookup therefore multiplies graph reservation quickly.
+
+`--no-cuda-graph` skips that allowance (eager launches). Use it when long context on 24 GB matters
+more than peak decode speed.
+
+### Serve vs CLI on 24 GB (INT8 + MTP-3 + prompt-lookup)
+
+| Mode | Practical max `--max-context` |
+|---|---:|
+| 35B + graphs (default) | **8192** (12288 already OOMs) |
+| 35B + `--no-cuda-graph` | **65536** |
+| 27B vision + graphs | **12288** |
+| 27B vision + `--no-cuda-graph` | **64000** (65536 fails by a thin margin) |
+
+A CLI smoke without prompt-lookup can appear to “fit” a larger context with graphs still enabled,
+because lookup graph families are absent from the plan. Matching serve’s Lookup + MTP + Graphs
+flags reproduces the tighter serve limits.
+
+Default serve helpers therefore use **`--no-cuda-graph`** with **65536** (35B) / **64000** (27B vision).
 
 ## Convert yourself (optional)
 
@@ -133,10 +163,10 @@ See `scripts/install-root/`. Copy next to `bin/` + `models/`, or set `NINFER_ROO
 
 | Script | Artifact | Model id | Notes |
 |---|---|---|---|
-| `start-serve-abliterated.cmd` | 35B huihui | `qwen3.6-35b-a3b-huihui-abliterated` | `--text-only`, `--max-context 65536` |
+| `start-serve-abliterated.cmd` | 35B huihui | `qwen3.6-35b-a3b-huihui-abliterated` | `--text-only`, `--max-context 65536`, `--no-cuda-graph` |
 | `start-serve-baseline.cmd` | 35B official | `qwen3.6-35b-a3b` | same |
-| `start-serve-27b-abliterated.cmd` | 27B huihui | `qwen3.6-27b-huihui-abliterated` | vision OK |
-| `start-serve-27b-baseline.cmd` | 27B official | `qwen3.6-27b` | vision OK |
+| `start-serve-27b-abliterated.cmd` | 27B huihui | `qwen3.6-27b-huihui-abliterated` | vision, `--max-context 64000`, `--no-cuda-graph` |
+| `start-serve-27b-baseline.cmd` | 27B official | `qwen3.6-27b` | same |
 
 ## Licensing / attribution
 
