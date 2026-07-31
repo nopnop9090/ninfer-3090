@@ -26,6 +26,11 @@ The executable `--help` output is the exact source for command-line option spell
 |---|---|---|
 | Qwen3.6-27B | [Hugging Face](https://huggingface.co/neroued/Qwen3.6-27B-NInfer) | [model card](../model-cards/Qwen3.6-27B-NInfer/README.md) |
 | Qwen3.6-35B-A3B | [Hugging Face](https://huggingface.co/neroued/Qwen3.6-35B-A3B-NInfer) | [model card](../model-cards/Qwen3.6-35B-A3B-NInfer/README.md) |
+| 35B-A3B / 27B Huihui abliterated (pre-converted v1) | [35B](https://huggingface.co/ahmed22xa/Qwen3.6-35B-A3B-huihui-abliterated-NInfer) · [27B](https://huggingface.co/ahmed22xa/Qwen3.6-27B-huihui-abliterated-NInfer) | [community notes](community-rtx3090-notes.md) |
+
+## Community / validation notes
+
+- [RTX 3090 community notes (abliterated downloads, v1 pins, max-context, serve helpers)](community-rtx3090-notes.md)
 
 ## Repository-local guides
 

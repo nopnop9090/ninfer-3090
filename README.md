@@ -72,6 +72,35 @@ hf download neroued/Qwen3.6-35B-A3B-NInfer `
 The `.ninfer` artifact already contains the quantized weights and frontend resources. It is not a
 GGUF or Transformers checkpoint and does not require conversion after download.
 
+> **Container v1 pin:** Prebuilt **v0.3.1** expects NInfer container **v1**. If Hugging Face `main`
+> advances to v2, pin the revisions documented in
+> [docs/community-rtx3090-notes.md](docs/community-rtx3090-notes.md) (or use the download scripts below).
+
+## Community notes (`my-work`): abliterated models, 65k context, vision
+
+Validated RTX 3090 workflow notes, max-context measurements, API caveats, and serve helpers live in
+**[docs/community-rtx3090-notes.md](docs/community-rtx3090-notes.md)**.
+
+Pre-converted Huihui-abliterated `.ninfer` artifacts (no local BF16 conversion required):
+
+| Model | Download | Size | SHA-256 |
+|---|---|---:|---|
+| 35B-A3B huihui abliterated | [Hugging Face](https://huggingface.co/ahmed22xa/Qwen3.6-35B-A3B-huihui-abliterated-NInfer) | 20.84 GB | `be263652c8540b9f6d2655fcded3b23eed3193e0c18f9fc29f088a9cd3d6689b` |
+| 27B huihui abliterated (vision OK) | [Hugging Face](https://huggingface.co/ahmed22xa/Qwen3.6-27B-huihui-abliterated-NInfer) | 16.29 GB | `1022d8695caa5d04528f7633e4b21bcbefd3b6173cd67babdd4af0ab682c3dc2` |
+
+```powershell
+# downloads both abliterated artifacts into .\models and verifies SHA-256
+.\scripts\download-models.ps1 -Models abliterated
+# also: baseline | all | 35b-abliterated | 27b-abliterated | ...
+```
+
+```bash
+./scripts/download-models.sh abliterated
+```
+
+On 24 GB: 35B needs `--text-only`; 27B can run with vision. Default serve scripts use
+`--max-context 65536` (see `scripts/install-root/`).
+
 ## Recommended 35B-A3B command
 
 ### Windows
